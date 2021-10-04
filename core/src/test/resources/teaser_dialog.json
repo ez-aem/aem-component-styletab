@@ -1,0 +1,531 @@
+{
+  "trackingFeature": "core-components:teaser:v1",
+  "extraClientlibs": [
+    "core.wcm.components.teaser.v1.editor"
+  ],
+  "sling:resourceType": "cq/gui/components/authoring/dialog",
+  "jcr:primaryType": "nt:unstructured",
+  "jcr:title": "Teaser",
+  "helpPath": "https://www.adobe.com/go/aem_cmp_teaser_v1",
+  "content": {
+    "sling:resourceType": "granite/ui/components/coral/foundation/container",
+    "jcr:primaryType": "nt:unstructured",
+    "granite:class": "cmp-teaser__editor",
+    "items": {
+      "jcr:primaryType": "nt:unstructured",
+      "tabs": {
+        "sling:resourceType": "granite/ui/components/coral/foundation/tabs",
+        "jcr:primaryType": "nt:unstructured",
+        "maximized": true,
+        "items": {
+          "jcr:primaryType": "nt:unstructured",
+          "image": {
+            "sling:resourceType": "granite/ui/components/coral/foundation/container",
+            "jcr:primaryType": "nt:unstructured",
+            "jcr:title": "Image",
+            "margin": true,
+            "items": {
+              "jcr:primaryType": "nt:unstructured",
+              "columns": {
+                "sling:resourceType": "granite/ui/components/coral/foundation/fixedcolumns",
+                "jcr:primaryType": "nt:unstructured",
+                "margin": true,
+                "items": {
+                  "jcr:primaryType": "nt:unstructured",
+                  "column": {
+                    "sling:resourceType": "granite/ui/components/coral/foundation/container",
+                    "jcr:primaryType": "nt:unstructured",
+                    "items": {
+                      "jcr:primaryType": "nt:unstructured",
+                      "file": {
+                        "fileReferenceParameter": "./fileReference",
+                        "multiple": false,
+                        "sling:resourceType": "cq/gui/components/authoring/dialog/fileupload",
+                        "title": "Upload Image Asset",
+                        "useHTML5": true,
+                        "autoStart": false,
+                        "mimeTypes": [
+                          "image/gif",
+                          "image/jpeg",
+                          "image/png",
+                          "image/tiff",
+                          "image/svg+xml"
+                        ],
+                        "uploadUrl": "${suffix.path}",
+                        "fieldLabel": "Image Asset",
+                        "fileNameParameter": "./fileName",
+                        "name": "./file",
+                        "allowUpload": false,
+                        "jcr:primaryType": "nt:unstructured",
+                        "class": "cq-droptarget"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "text": {
+            "sling:resourceType": "granite/ui/components/coral/foundation/container",
+            "jcr:primaryType": "nt:unstructured",
+            "jcr:title": "Text",
+            "margin": true,
+            "items": {
+              "jcr:primaryType": "nt:unstructured",
+              "columns": {
+                "sling:resourceType": "granite/ui/components/coral/foundation/fixedcolumns",
+                "jcr:primaryType": "nt:unstructured",
+                "margin": true,
+                "items": {
+                  "jcr:primaryType": "nt:unstructured",
+                  "column": {
+                    "sling:resourceType": "granite/ui/components/coral/foundation/container",
+                    "jcr:primaryType": "nt:unstructured",
+                    "items": {
+                      "jcr:primaryType": "nt:unstructured",
+                      "pretitle": {
+                        "name": "./pretitle",
+                        "sling:resourceType": "granite/ui/components/coral/foundation/form/textfield",
+                        "jcr:primaryType": "nt:unstructured",
+                        "fieldDescription": "A pretitle that will be displayed above the Teaser's title.",
+                        "fieldLabel": "Pretitle"
+                      },
+                      "titleGroup": {
+                        "sling:resourceType": "granite/ui/components/coral/foundation/well",
+                        "jcr:primaryType": "nt:unstructured",
+                        "granite:hide": "${cqDesign.titleHidden}",
+                        "items": {
+                          "jcr:primaryType": "nt:unstructured",
+                          "title": {
+                            "fieldLabel": "Title",
+                            "name": "./jcr:title",
+                            "sling:resourceType": "granite/ui/components/coral/foundation/form/textfield",
+                            "jcr:primaryType": "nt:unstructured",
+                            "fieldDescription": "A title to display as the headline for the teaser.",
+                            "value": "${cqDesign._jcr_description}"
+                          },
+                          "titleType": {
+                            "granite:class": "foundation-toggleable",
+                            "fieldLabel": "Title Type",
+                            "name": "./titleType",
+                            "sling:resourceType": "granite/ui/components/coral/foundation/form/select",
+                            "jcr:primaryType": "nt:unstructured",
+                            "granite:hide": "${!cqDesign.showTitleType}",
+                            "items": {
+                              "jcr:primaryType": "nt:unstructured",
+                              "def": {
+                                "jcr:primaryType": "nt:unstructured",
+                                "text": "(default)",
+                                "value": ""
+                              },
+                              "h1": {
+                                "jcr:primaryType": "nt:unstructured",
+                                "text": "H1",
+                                "value": "h1"
+                              },
+                              "h2": {
+                                "jcr:primaryType": "nt:unstructured",
+                                "text": "H2",
+                                "value": "h2"
+                              },
+                              "h3": {
+                                "jcr:primaryType": "nt:unstructured",
+                                "text": "H3",
+                                "value": "h3"
+                              },
+                              "h4": {
+                                "jcr:primaryType": "nt:unstructured",
+                                "text": "H4",
+                                "value": "h4"
+                              },
+                              "h5": {
+                                "jcr:primaryType": "nt:unstructured",
+                                "text": "H5",
+                                "value": "h5"
+                              },
+                              "h6": {
+                                "jcr:primaryType": "nt:unstructured",
+                                "text": "H6",
+                                "value": "h6"
+                              }
+                            }
+                          },
+                          "titleFromLinkedPage": {
+                            "uncheckedValue": false,
+                            "name": "./titleFromPage",
+                            "checked": false,
+                            "sling:resourceType": "granite/ui/components/coral/foundation/form/checkbox",
+                            "jcr:primaryType": "nt:unstructured",
+                            "fieldDescription": "When checked, populate the title with the linked page's title.",
+                            "text": "Get title from linked page",
+                            "value": true
+                          }
+                        }
+                      },
+                      "descriptionGroup": {
+                        "sling:resourceType": "granite/ui/components/coral/foundation/well",
+                        "jcr:primaryType": "nt:unstructured",
+                        "granite:hide": "${cqDesign.descriptionHidden}",
+                        "items": {
+                          "jcr:primaryType": "nt:unstructured",
+                          "description": {
+                            "useFixedInlineToolbar": true,
+                            "fieldLabel": "Description",
+                            "name": "./jcr:description",
+                            "sling:resourceType": "cq/gui/components/authoring/dialog/richtext",
+                            "jcr:primaryType": "nt:unstructured",
+                            "fieldDescription": "A description to display as the subheadline for the teaser.",
+                            "rtePlugins": {
+                              "jcr:primaryType": "nt:unstructured",
+                              "format": {
+                                "features": "bold,italic",
+                                "jcr:primaryType": "nt:unstructured"
+                              },
+                              "justify": {
+                                "features": "-",
+                                "jcr:primaryType": "nt:unstructured"
+                              },
+                              "links": {
+                                "features": "modifylink,unlink",
+                                "jcr:primaryType": "nt:unstructured"
+                              },
+                              "lists": {
+                                "features": "*",
+                                "jcr:primaryType": "nt:unstructured"
+                              },
+                              "misctools": {
+                                "jcr:primaryType": "nt:unstructured",
+                                "specialCharsConfig": {
+                                  "jcr:primaryType": "nt:unstructured",
+                                  "chars": {
+                                    "jcr:primaryType": "nt:unstructured",
+                                    "default_copyright": {
+                                      "name": "copyright",
+                                      "jcr:primaryType": "nt:unstructured",
+                                      "entity": "&copy;"
+                                    },
+                                    "default_euro": {
+                                      "name": "euro",
+                                      "jcr:primaryType": "nt:unstructured",
+                                      "entity": "&euro;"
+                                    },
+                                    "default_registered": {
+                                      "name": "registered",
+                                      "jcr:primaryType": "nt:unstructured",
+                                      "entity": "&reg;"
+                                    },
+                                    "default_trademark": {
+                                      "name": "trademark",
+                                      "jcr:primaryType": "nt:unstructured",
+                                      "entity": "&trade;"
+                                    }
+                                  }
+                                }
+                              },
+                              "paraformat": {
+                                "features": "*",
+                                "jcr:primaryType": "nt:unstructured",
+                                "formats": {
+                                  "jcr:primaryType": "nt:unstructured",
+                                  "default_p": {
+                                    "description": "Paragraph",
+                                    "jcr:primaryType": "nt:unstructured",
+                                    "tag": "p"
+                                  },
+                                  "default_h1": {
+                                    "description": "Heading 1",
+                                    "jcr:primaryType": "nt:unstructured",
+                                    "tag": "h1"
+                                  },
+                                  "default_h2": {
+                                    "description": "Heading 2",
+                                    "jcr:primaryType": "nt:unstructured",
+                                    "tag": "h2"
+                                  },
+                                  "default_h3": {
+                                    "description": "Heading 3",
+                                    "jcr:primaryType": "nt:unstructured",
+                                    "tag": "h3"
+                                  },
+                                  "default_h4": {
+                                    "description": "Heading 4",
+                                    "jcr:primaryType": "nt:unstructured",
+                                    "tag": "h4"
+                                  },
+                                  "default_h5": {
+                                    "description": "Heading 5",
+                                    "jcr:primaryType": "nt:unstructured",
+                                    "tag": "h5"
+                                  },
+                                  "default_h6": {
+                                    "description": "Heading 6",
+                                    "jcr:primaryType": "nt:unstructured",
+                                    "tag": "h6"
+                                  },
+                                  "default_blockquote": {
+                                    "description": "Quote",
+                                    "jcr:primaryType": "nt:unstructured",
+                                    "tag": "blockquote"
+                                  },
+                                  "default_pre": {
+                                    "description": "Preformatted",
+                                    "jcr:primaryType": "nt:unstructured",
+                                    "tag": "pre"
+                                  }
+                                }
+                              },
+                              "table": {
+                                "features": "-",
+                                "jcr:primaryType": "nt:unstructured",
+                                "hiddenHeaderConfig": {
+                                  "jcr:primaryType": "nt:unstructured",
+                                  "hiddenHeaderEditingCSS": "cq-RichText-hiddenHeader--editing",
+                                  "hiddenHeaderClassName": "cq-wcm-foundation-aria-visuallyhidden"
+                                }
+                              },
+                              "tracklinks": {
+                                "features": "*",
+                                "jcr:primaryType": "nt:unstructured"
+                              }
+                            },
+                            "uiSettings": {
+                              "jcr:primaryType": "nt:unstructured",
+                              "cui": {
+                                "jcr:primaryType": "nt:unstructured",
+                                "inline": {
+                                  "toolbar": [
+                                    "format#bold",
+                                    "format#italic",
+                                    "format#underline",
+                                    "#justify",
+                                    "#lists",
+                                    "links#modifylink",
+                                    "links#unlink",
+                                    "#paraformat"
+                                  ],
+                                  "jcr:primaryType": "nt:unstructured",
+                                  "popovers": {
+                                    "jcr:primaryType": "nt:unstructured",
+                                    "justify": {
+                                      "jcr:primaryType": "nt:unstructured",
+                                      "ref": "justify",
+                                      "items": [
+                                        "justify#justifyleft",
+                                        "justify#justifycenter",
+                                        "justify#justifyright"
+                                      ]
+                                    },
+                                    "lists": {
+                                      "jcr:primaryType": "nt:unstructured",
+                                      "ref": "lists",
+                                      "items": [
+                                        "lists#unordered",
+                                        "lists#ordered",
+                                        "lists#outdent",
+                                        "lists#indent"
+                                      ]
+                                    },
+                                    "paraformat": {
+                                      "jcr:primaryType": "nt:unstructured",
+                                      "ref": "paraformat",
+                                      "items": "paraformat:getFormats:paraformat-pulldown"
+                                    }
+                                  }
+                                },
+                                "dialogFullScreen": {
+                                  "toolbar": [
+                                    "format#bold",
+                                    "format#italic",
+                                    "format#underline",
+                                    "justify#justifyleft",
+                                    "justify#justifycenter",
+                                    "justify#justifyright",
+                                    "lists#unordered",
+                                    "lists#ordered",
+                                    "lists#outdent",
+                                    "lists#indent",
+                                    "links#modifylink",
+                                    "links#unlink",
+                                    "table#createoredit",
+                                    "#paraformat",
+                                    "image#imageProps"
+                                  ],
+                                  "jcr:primaryType": "nt:unstructured",
+                                  "popovers": {
+                                    "jcr:primaryType": "nt:unstructured",
+                                    "paraformat": {
+                                      "jcr:primaryType": "nt:unstructured",
+                                      "ref": "paraformat",
+                                      "items": "paraformat:getFormats:paraformat-pulldown"
+                                    }
+                                  }
+                                },
+                                "tableEditOptions": {
+                                  "toolbar": [
+                                    "table#insertcolumn-before",
+                                    "table#insertcolumn-after",
+                                    "table#removecolumn",
+                                    "-",
+                                    "table#insertrow-before",
+                                    "table#insertrow-after",
+                                    "table#removerow",
+                                    "-",
+                                    "table#mergecells-right",
+                                    "table#mergecells-down",
+                                    "table#mergecells",
+                                    "table#splitcell-horizontal",
+                                    "table#splitcell-vertical",
+                                    "-",
+                                    "table#selectrow",
+                                    "table#selectcolumn",
+                                    "-",
+                                    "table#ensureparagraph",
+                                    "-",
+                                    "table#modifytableandcell",
+                                    "table#removetable",
+                                    "-",
+                                    "undo#undo",
+                                    "undo#redo",
+                                    "-",
+                                    "table#exitTableEditing",
+                                    "-"
+                                  ],
+                                  "jcr:primaryType": "nt:unstructured"
+                                }
+                              }
+                            }
+                          },
+                          "descriptionFromLinkedPage": {
+                            "uncheckedValue": false,
+                            "name": "./descriptionFromPage",
+                            "checked": false,
+                            "sling:resourceType": "granite/ui/components/coral/foundation/form/checkbox",
+                            "jcr:primaryType": "nt:unstructured",
+                            "fieldDescription": "When checked, populate the description with the linked page's description.",
+                            "text": "Get description from linked page",
+                            "value": true
+                          }
+                        }
+                      },
+                      "id": {
+                        "name": "./id",
+                        "sling:resourceType": "granite/ui/components/coral/foundation/form/textfield",
+                        "jcr:primaryType": "nt:unstructured",
+                        "fieldDescription": "HTML ID attribute to apply to the component.",
+                        "fieldLabel": "ID"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "actions": {
+            "sling:resourceType": "granite/ui/components/coral/foundation/container",
+            "jcr:primaryType": "nt:unstructured",
+            "jcr:title": "Link & Actions",
+            "margin": true,
+            "items": {
+              "jcr:primaryType": "nt:unstructured",
+              "columns": {
+                "sling:resourceType": "granite/ui/components/coral/foundation/fixedcolumns",
+                "jcr:primaryType": "nt:unstructured",
+                "margin": true,
+                "items": {
+                  "jcr:primaryType": "nt:unstructured",
+                  "column": {
+                    "sling:resourceType": "granite/ui/components/coral/foundation/container",
+                    "jcr:primaryType": "nt:unstructured",
+                    "items": {
+                      "jcr:primaryType": "nt:unstructured",
+                      "linkURL": {
+                        "wrapperClass": "foundation-toggleable cmp-teaser__editor-link-url",
+                        "fieldLabel": "Link",
+                        "name": "./linkURL",
+                        "sling:resourceType": "cq/gui/components/coral/common/form/pagefield",
+                        "jcr:primaryType": "nt:unstructured",
+                        "fieldDescription": "Link applied to teaser elements. URL or path to a content page.",
+                        "rootPath": "/content"
+                      },
+                      "actionsEnabled": {
+                        "uncheckedValue": false,
+                        "name": "./actionsEnabled",
+                        "sling:resourceType": "granite/ui/components/coral/foundation/form/checkbox",
+                        "jcr:primaryType": "nt:unstructured",
+                        "fieldDescription": "When checked, enables definition of Call-To-Actions. The linked page of the first Call-To-Action is used when populating title and description.",
+                        "text": "Enable Call-To-Actions",
+                        "value": true,
+                        "granite:rendercondition": {
+                          "sling:resourceType": "/libs/granite/ui/components/coral/foundation/renderconditions/simple",
+                          "jcr:primaryType": "nt:unstructured",
+                          "expression": "${!cqDesign.actionsDisabled}"
+                        }
+                      },
+                      "actionsDisabled": {
+                        "uncheckedValue": false,
+                        "name": "./actionsEnabled",
+                        "checked": false,
+                        "ignoreData": true,
+                        "sling:resourceType": "granite/ui/components/coral/foundation/form/checkbox",
+                        "jcr:primaryType": "nt:unstructured",
+                        "disabled": true,
+                        "fieldDescription": "When checked, enables definition of Call-To-Actions. The linked page of the first Call-To-Action is used when populating title and description.",
+                        "text": "Enable Call-To-Actions",
+                        "value": true,
+                        "granite:rendercondition": {
+                          "sling:resourceType": "/libs/granite/ui/components/coral/foundation/renderconditions/simple",
+                          "jcr:primaryType": "nt:unstructured",
+                          "expression": "${cqDesign.actionsDisabled}"
+                        }
+                      },
+                      "actions": {
+                        "sling:resourceType": "granite/ui/components/coral/foundation/form/multifield",
+                        "jcr:primaryType": "nt:unstructured",
+                        "composite": true,
+                        "granite:class": "foundation-toggleable cmp-teaser__editor-multifield_actions",
+                        "field": {
+                          "name": "./actions",
+                          "sling:resourceType": "granite/ui/components/coral/foundation/container",
+                          "jcr:primaryType": "nt:unstructured",
+                          "granite:class": "cmp-teaser__editor-action",
+                          "items": {
+                            "jcr:primaryType": "nt:unstructured",
+                            "link": {
+                              "emptyText": "Link",
+                              "granite:class": "cmp-teaser__editor-actionField",
+                              "name": "link",
+                              "sling:resourceType": "cq/gui/components/coral/common/form/pagefield",
+                              "jcr:primaryType": "nt:unstructured",
+                              "rootPath": "/content",
+                              "required": true,
+                              "granite:data": {
+                                "jcr:primaryType": "nt:unstructured",
+                                "cmp-teaser-v1-dialog-edit-hook": "actionLink"
+                              }
+                            },
+                            "text": {
+                              "emptyText": "Text",
+                              "granite:class": "cmp-teaser__editor-actionField",
+                              "name": "text",
+                              "sling:resourceType": "granite/ui/components/coral/foundation/form/textfield",
+                              "jcr:primaryType": "nt:unstructured",
+                              "required": true,
+                              "granite:data": {
+                                "jcr:primaryType": "nt:unstructured",
+                                "cmp-teaser-v1-dialog-edit-hook": "actionTitle"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
