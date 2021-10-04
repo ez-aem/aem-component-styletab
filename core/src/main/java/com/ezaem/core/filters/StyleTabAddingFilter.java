@@ -93,7 +93,7 @@ public class StyleTabAddingFilter implements Filter {
 
         public SyntheticStyleTabResourceWrapper(Resource resource, int depth) {
             super(resource);
-            log.error("Wrapping, depth {}, path {}", depth, resource.getPath());
+            log.debug("Wrapping, depth {}, path {}", depth, resource.getPath());
             this.depth = depth;
         }
 
@@ -111,10 +111,10 @@ public class StyleTabAddingFilter implements Filter {
         public Iterator<Resource> listChildren() {
             Iterator<Resource> originalChildren = super.listChildren();
             if (depth > 0) {
-                log.error("Transforming children");
+                log.debug("Transforming children");
                 return Iterators.transform(originalChildren, child -> new SyntheticStyleTabResourceWrapper(child, depth - 1));
             } else if (depth == 0) {
-                log.error("Adding synthetic style tab");
+                log.debug("Adding synthetic style tab");
                 Iterator<Resource> syntheticStyleTab = Iterators.singletonIterator(new SyntheticResourceWithProperties(
                         getResourceResolver(), getResource().getPath() + "/styletab", "granite/ui/components/coral/foundation/include",
                         Map.of("path", "cq/gui/components/authoring/dialog/style/tab_edit/styletab")));
