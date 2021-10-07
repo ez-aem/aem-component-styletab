@@ -45,10 +45,16 @@ public class StyleTabAddingFilter implements Filter {
 
             Optional<Resource> targetResource = Optional.of(slingRequest.getRequestPathInfo())
                     .map(RequestPathInfo::getSuffixResource);
-            Optional<ContentPolicyStyleInfo> targetStyleInfo = targetResource
+            boolean hasSomeStyles = targetResource
                     .map(r -> r.adaptTo(ComponentStyleInfo.class))
-                    .map(ComponentStyleInfo::getContentPolicyStyleInfo);
-            if (!targetResource.isPresent() || targetStyleInfo.isPresent()) {
+                    .map(ComponentStyleInfo::getContentPolicyStyleInfo)
+                    .map(ContentPolicyStyleInfo::getStyleGroups)
+                    .flatMap(styleGroups -> styleGroups.stream()
+                            .flatMap(styleGroup -> styleGroup.getStyles().stream())
+                            .findAny()
+                    )
+                    .isPresent();
+            if (!targetResource.isPresent() || hasSomeStyles) {
                 log.trace("Root at {}", resource.getPath());
                 request = new SlingHttpServletRequestWrapper(slingRequest) {
 
@@ -161,7 +167,7 @@ public class StyleTabAddingFilter implements Filter {
         private boolean isStyleTab(Resource resource) {
             return resource.isResourceType("granite/ui/components/coral/foundation/include")
                     && resource.getValueMap().get("path", StringUtils.EMPTY)
-                            .equals("cq/gui/components/authoring/dialog/style/tab_edit/styletab");
+                    .equals("cq/gui/components/authoring/dialog/style/tab_edit/styletab");
         }
     }
 
