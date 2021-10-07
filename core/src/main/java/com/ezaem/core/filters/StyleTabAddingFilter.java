@@ -51,8 +51,7 @@ public class StyleTabAddingFilter implements Filter {
                     .map(ContentPolicyStyleInfo::getStyleGroups)
                     .flatMap(styleGroups -> styleGroups.stream()
                             .flatMap(styleGroup -> styleGroup.getStyles().stream())
-                            .findAny()
-                    )
+                            .findAny())
                     .isPresent();
             if (!targetResource.isPresent() || hasSomeStyles) {
                 log.trace("Root at {}", resource.getPath());
