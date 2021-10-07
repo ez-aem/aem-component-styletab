@@ -1,8 +1,11 @@
 package com.ezaem.core.filters;
 
+import com.adobe.cq.wcm.style.ComponentStyleInfo;
+import com.adobe.cq.wcm.style.ContentPolicyStyleInfo;
 import com.google.common.collect.Iterators;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.sling.api.SlingHttpServletRequest;
+import org.apache.sling.api.request.RequestPathInfo;
 import org.apache.sling.api.resource.*;
 import org.apache.sling.api.wrappers.SlingHttpServletRequestWrapper;
 import org.apache.sling.api.wrappers.ValueMapDecorator;
@@ -19,6 +22,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Component(service = Filter.class,
         property = {
@@ -39,20 +43,27 @@ public class StyleTabAddingFilter implements Filter {
         Resource resource = slingRequest.getResource();
         if (resource.isResourceType("cq/gui/components/authoring/dialog")) {
 
-            log.trace("Root at {}", resource.getPath());
-            request = new SlingHttpServletRequestWrapper(slingRequest) {
+            Optional<Resource> targetResource = Optional.of(slingRequest.getRequestPathInfo())
+                    .map(RequestPathInfo::getSuffixResource);
+            Optional<ContentPolicyStyleInfo> targetStyleInfo = targetResource
+                    .map(r -> r.adaptTo(ComponentStyleInfo.class))
+                    .map(ComponentStyleInfo::getContentPolicyStyleInfo);
+            if (!targetResource.isPresent() || targetStyleInfo.isPresent()) {
+                log.trace("Root at {}", resource.getPath());
+                request = new SlingHttpServletRequestWrapper(slingRequest) {
 
-                @Override
-                public Resource getResource() {
-                    Resource originalResource = super.getResource();
-                    // 4 is the depth of the tabs in configuration dialogs of the CoreComponents
-                    if (originalResource.isResourceType("cq/gui/components/authoring/dialog")) {
-                        return new StyleTabAddingResourceWrapper(originalResource, 4);
-                    } else {
-                        return originalResource;
+                    @Override
+                    public Resource getResource() {
+                        Resource originalResource = super.getResource();
+                        // 4 is the depth of the tabs in configuration dialogs of the CoreComponents
+                        if (originalResource.isResourceType("cq/gui/components/authoring/dialog")) {
+                            return new StyleTabAddingResourceWrapper(originalResource, 4);
+                        } else {
+                            return originalResource;
+                        }
                     }
-                }
-            };
+                };
+            }
         }
         filterChain.doFilter(request, response);
     }
