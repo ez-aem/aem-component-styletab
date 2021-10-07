@@ -5,9 +5,11 @@ import io.wcm.testing.mock.aem.junit5.AemContext;
 import io.wcm.testing.mock.aem.junit5.AemContextExtension;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.resource.Resource;
+import org.hamcrest.collection.IsCollectionWithSize;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.platform.commons.util.CollectionUtils;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -23,6 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -42,7 +45,7 @@ class StyleTabAddingFilterTest {
     ArgumentCaptor<ServletRequest> requestCaptor;
 
     @Test
-    void testThatTheTabIsAdded() throws ServletException, IOException {
+    void testThatTheTabIsAddedWhenNotPresent() throws ServletException, IOException {
         context.load().json("/teaser_dialog.json", "/libs/wcm/core/teaser/cq:dialog");
         context.currentResource("/libs/wcm/core/teaser/cq:dialog");
         context.request().setResource(context.currentResource());
@@ -50,7 +53,7 @@ class StyleTabAddingFilterTest {
         verify(filterChain).doFilter(requestCaptor.capture(), any());
         SlingHttpServletRequest augmentedRequest = (SlingHttpServletRequest) requestCaptor.getValue();
         Resource augmentedResource = augmentedRequest.getResource();
-        List<String> fourthLevelResourceTypes = Arrays.stream(
+        List<Resource> fourthLevelResources = Arrays.stream(
                 Iterators.toArray(
                         augmentedResource.getChild("content")
                                 .getChild("items")
@@ -58,10 +61,34 @@ class StyleTabAddingFilterTest {
                                 .getChild("items")
                                 .listChildren(),
                         Resource.class))
-                .map(Resource::getResourceType)
                 .collect(Collectors.toList());
 
-        assertThat(fourthLevelResourceTypes,
+        assertThat(fourthLevelResources, hasSize(4));
+        assertThat(fourthLevelResources.stream().map(Resource::getResourceType).collect(Collectors.toList()),
+                hasItem("granite/ui/components/coral/foundation/include"));
+    }
+
+    @Test
+    void testThatTheTabIsNotAddedWhenAlreadyPresent() throws ServletException, IOException {
+        context.load().json("/teaser_dialog_with_styletab.json", "/libs/wcm/core/teaser/cq:dialog");
+        context.currentResource("/libs/wcm/core/teaser/cq:dialog");
+        context.request().setResource(context.currentResource());
+        filter.doFilter(context.request(), context.response(), filterChain);
+        verify(filterChain).doFilter(requestCaptor.capture(), any());
+        SlingHttpServletRequest augmentedRequest = (SlingHttpServletRequest) requestCaptor.getValue();
+        Resource augmentedResource = augmentedRequest.getResource();
+        List<Resource> fourthLevelResources = Arrays.stream(
+                        Iterators.toArray(
+                                augmentedResource.getChild("content")
+                                        .getChild("items")
+                                        .getChild("tabs")
+                                        .getChild("items")
+                                        .listChildren(),
+                                Resource.class))
+                .collect(Collectors.toList());
+
+        assertThat(fourthLevelResources, hasSize(4));
+        assertThat(fourthLevelResources.stream().map(Resource::getResourceType).collect(Collectors.toList()),
                 hasItem("granite/ui/components/coral/foundation/include"));
     }
 }
