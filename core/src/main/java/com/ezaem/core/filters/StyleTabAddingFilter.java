@@ -1,18 +1,5 @@
 package com.ezaem.core.filters;
 
-import java.io.IOException;
-import java.lang.invoke.MethodHandles;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Optional;
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-
 import com.google.common.collect.Iterators;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.sling.api.SlingHttpServletRequest;
@@ -26,7 +13,12 @@ import org.osgi.service.component.propertytypes.ServiceRanking;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static javax.jcr.query.Query.JCR_SQL2;
+import javax.servlet.*;
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 @Component(service = Filter.class,
         property = {
@@ -39,12 +31,6 @@ public class StyleTabAddingFilter implements Filter {
 
     private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private static String EXISTING_STYLETAB_QUERY_TEMPLATE = "SELECT * FROM [nt:base] WHERE ISDESCENDANTNODE([%s]) " +
-            "AND [path]='cq/gui/components/authoring/dialog/style/tab_edit/styletab' " +
-            "AND [sling:resourceType]='granite/ui/components/coral/foundation/include'";
-
-    private static String EXISTING_TABS_QUERY_TEMPLATE = "SELECT * FROM [nt:base] WHERE ISDESCENDANTNODE([%s]) " +
-            "AND [sling:resourceType]='granite/ui/components/coral/foundation/tabs'";
     @Override
     public void doFilter(ServletRequest request, final ServletResponse response,
                          final FilterChain filterChain) throws IOException, ServletException {
@@ -52,27 +38,19 @@ public class StyleTabAddingFilter implements Filter {
         SlingHttpServletRequest slingRequest = (SlingHttpServletRequest) request;
         Resource resource = slingRequest.getResource();
         if (resource.isResourceType("cq/gui/components/authoring/dialog")) {
-//            ResourceResolver resolver = slingRequest.getResourceResolver();
-//            String jcrPath = resource.getPath().replaceFirst("/mnt/override", "");
-//            Iterator<Resource> existingStyletab = resolver.findResources(String.format(EXISTING_STYLETAB_QUERY_TEMPLATE, jcrPath), JCR_SQL2);
-//            boolean styleTabNeeded = !existingStyletab.hasNext();
-//
-//            if (styleTabNeeded) {
-//                String q = String.format(EXISTING_TABS_QUERY_TEMPLATE, jcrPath);
-//                Iterator<Resource> tabsComponents = resolver.findResources(String.format(EXISTING_TABS_QUERY_TEMPLATE, jcrPath), JCR_SQL2);
-//                Resource topTabComponent = null;
-//                Optional<Integer> level = Arrays.stream(Iterators.toArray(
-//                        Iterators.transform(tabsComponents, component -> StringUtils.countMatches(jcrPath, '/')), Integer.class
-//                )).sorted().findFirst();
-//                int baseline = StringUtils.countMatches(resource.getPath(), '/');
-//            }
 
+            log.trace("Root at {}", resource.getPath());
             request = new SlingHttpServletRequestWrapper(slingRequest) {
 
                 @Override
                 public Resource getResource() {
+                    Resource originalResource = super.getResource();
                     // 4 is the depth of the tabs in configuration dialogs of the CoreComponents
-                    return new SyntheticStyleTabResourceWrapper(super.getResource(), 4);
+                    if (originalResource.isResourceType("cq/gui/components/authoring/dialog")) {
+                        return new StyleTabAddingResourceWrapper(originalResource, 4);
+                    } else {
+                        return originalResource;
+                    }
                 }
             };
         }
@@ -87,13 +65,13 @@ public class StyleTabAddingFilter implements Filter {
     public void destroy() {
     }
 
-    private class SyntheticStyleTabResourceWrapper extends ResourceWrapper {
+    private class StyleTabAddingResourceWrapper extends ResourceWrapper {
 
         private int depth;
 
-        public SyntheticStyleTabResourceWrapper(Resource resource, int depth) {
+        public StyleTabAddingResourceWrapper(Resource resource, int depth) {
             super(resource);
-            log.debug("Wrapping, depth {}, path {}", depth, resource.getPath());
+            log.trace("{} New wrapper, path {}", depth, resource.getPath());
             this.depth = depth;
         }
 
@@ -101,40 +79,94 @@ public class StyleTabAddingFilter implements Filter {
         public Resource getChild(String relPath) {
             Resource original = super.getChild(relPath);
             if (original == null || depth == 0) {
+                log.trace("{} Child original, {} {}", depth, relPath, getPath());
                 return original;
             } else {
-                return new SyntheticStyleTabResourceWrapper(original, depth - 1);
+                log.trace("{} Child wrapping, {} {}", depth, relPath, getPath());
+                return new StyleTabAddingResourceWrapper(original, depth - 1);
             }
+        }
+
+        @Override
+        public Iterable<Resource> getChildren() {
+            return () -> listChildren();
         }
 
         @Override
         public Iterator<Resource> listChildren() {
             Iterator<Resource> originalChildren = super.listChildren();
+            log.trace("{} getChildren of {}", depth, getPath());
             if (depth > 0) {
-                log.debug("Transforming children");
-                return Iterators.transform(originalChildren, child -> new SyntheticStyleTabResourceWrapper(child, depth - 1));
-            } else if (depth == 0) {
-                log.debug("Adding synthetic style tab");
-                Iterator<Resource> syntheticStyleTab = Iterators.singletonIterator(new SyntheticResourceWithProperties(
-                        getResourceResolver(), getResource().getPath() + "/styletab", "granite/ui/components/coral/foundation/include",
-                        Map.of("path", "cq/gui/components/authoring/dialog/style/tab_edit/styletab")));
-                return Iterators.concat(originalChildren, syntheticStyleTab);
+                log.trace("{} Children wrapping, {}", depth, getPath());
+                return Iterators.transform(originalChildren, child -> new StyleTabAddingResourceWrapper(child, depth - 1));
+            } else if (depth == 0 && getResource().getParent().isResourceType("granite/ui/components/coral/foundation/tabs")) {
+                log.trace("{} Adding tab, {}", depth, getPath());
+                return new StyleTabAddingIterator(originalChildren, getResourceResolver(), getPath());
             } else {
+                log.trace("{} Children original, {}", depth, getPath());
                 return originalChildren;
             }
+        }
+    }
+
+    private static class StyleTabAddingIterator implements Iterator<Resource> {
+
+        private Iterator<Resource> existingItems;
+        private ResourceResolver resolver;
+        private String path;
+        private boolean needsStyleTab = true;
+
+        public StyleTabAddingIterator(Iterator<Resource> existingItems, ResourceResolver resolver, String path) {
+            this.existingItems = existingItems;
+            this.resolver = resolver;
+            this.path = path;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return existingItems.hasNext() || needsStyleTab;
+        }
+
+        @Override
+        public Resource next() {
+            if (existingItems.hasNext()) {
+                Resource existingItem = existingItems.next();
+                if (isStyleTab(existingItem)) {
+                    needsStyleTab = false;
+                }
+                return existingItem;
+            } else {
+                if (needsStyleTab) {
+                    needsStyleTab = false;
+                    return new SyntheticResourceWithProperties(
+                            resolver, path + "/styletab", "granite/ui/components/coral/foundation/include",
+                            Map.of("path", "cq/gui/components/authoring/dialog/style/tab_edit/styletab"));
+                } else {
+                    throw new NoSuchElementException();
+                }
+            }
+        }
+
+        private boolean isStyleTab(Resource resource) {
+            return resource.isResourceType("granite/ui/components/coral/foundation/include")
+                    && resource.getValueMap().get("path", StringUtils.EMPTY)
+                            .equals("cq/gui/components/authoring/dialog/style/tab_edit/styletab");
         }
     }
 
     private static class SyntheticResourceWithProperties extends SyntheticResource {
         private Map<String, Object> properties;
 
-        SyntheticResourceWithProperties(ResourceResolver resourceResolver, String path, String resourceType, Map<String, Object> properties) {
+        SyntheticResourceWithProperties(ResourceResolver resourceResolver, String path,
+                                        String resourceType, Map<String, Object> properties) {
             super(resourceResolver, path, resourceType);
             this.properties = properties;
         }
 
         public <T> T adaptTo(Class<T> type) {
-            return type == ValueMap.class ? (T) new ValueMapDecorator(this.properties) : super.adaptTo(type);
+            return type == ValueMap.class
+                   ? (T) new ValueMapDecorator(this.properties)
+                   : super.adaptTo(type);
         }
     }
 }
