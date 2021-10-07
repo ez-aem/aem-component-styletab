@@ -3,13 +3,12 @@ package com.ezaem.core.filters;
 import com.google.common.collect.Iterators;
 import io.wcm.testing.mock.aem.junit5.AemContext;
 import io.wcm.testing.mock.aem.junit5.AemContextExtension;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.resource.Resource;
-import org.hamcrest.collection.IsCollectionWithSize;
-import org.junit.jupiter.api.BeforeEach;
+import org.apache.sling.api.resource.ValueMap;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.platform.commons.util.CollectionUtils;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -20,6 +19,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 
@@ -90,5 +89,31 @@ class StyleTabAddingFilterTest {
         assertThat(fourthLevelResources, hasSize(4));
         assertThat(fourthLevelResources.stream().map(Resource::getResourceType).collect(Collectors.toList()),
                 hasItem("granite/ui/components/coral/foundation/include"));
+    }
+
+    @Test
+    void testThatTheTabIsAddedOnlyOnce() throws ServletException, IOException {
+        context.load().json("/teaser_dialog.json", "/libs/wcm/core/teaser/cq:dialog");
+        context.currentResource("/libs/wcm/core/teaser/cq:dialog");
+        context.request().setResource(context.currentResource());
+        filter.doFilter(context.request(), context.response(), filterChain);
+        verify(filterChain).doFilter(requestCaptor.capture(), any());
+        SlingHttpServletRequest augmentedRequest = (SlingHttpServletRequest) requestCaptor.getValue();
+        Resource augmentedResource = augmentedRequest.getResource();
+
+        List<Resource> styleTabs = new ArrayList<>();
+        extractStyleTabs(augmentedResource, styleTabs);
+
+        assertThat(styleTabs, hasSize(1));
+    }
+
+    private void extractStyleTabs(Resource resource, List<Resource> accumulator) {
+        if (resource.isResourceType("granite/ui/components/coral/foundation/include")
+            && resource.getValueMap()
+                .get("path", StringUtils.EMPTY)
+                .equals("cq/gui/components/authoring/dialog/style/tab_edit/styletab")) {
+            accumulator.add(resource);
+        }
+        resource.getChildren().forEach(child -> extractStyleTabs(child, accumulator));
     }
 }
