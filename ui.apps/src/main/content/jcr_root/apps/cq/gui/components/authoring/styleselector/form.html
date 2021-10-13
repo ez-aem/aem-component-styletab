@@ -1,0 +1,31 @@
+<!--/*
+
+  ADOBE CONFIDENTIAL
+  __________________
+
+   Copyright 2017 Adobe Systems Incorporated
+   All Rights Reserved.
+
+  NOTICE:  All information contained herein is, and remains
+  the property of Adobe Systems Incorporated and its suppliers,
+  if any.  The intellectual and technical concepts contained
+  herein are proprietary to Adobe Systems Incorporated and its
+  suppliers and are protected by trade secret or copyright law.
+  Dissemination of this information or reproduction of this material
+  is strictly forbidden unless prior written permission is obtained
+  from Adobe Systems Incorporated.
+
+*/-->
+<form data-sly-use.styleSelector="${'com.ezaem.core.models.StyleHidingModel' @ path=request.requestPathInfo.suffix, resourceType=request.requestParameterMap['resourceType']}" id="editor-styleselector-form" action="${styleSelector.action}" method="post" data-editor-styleselector-item-id="${styleSelector.path}" class="foundation-form" data-foundation-form-ajax="true" data-editor-styleselector-form>
+    <coral-selectlist class="editor-StyleSelector-selectList" multiple data-editor-styleselector-selectlist data-sly-list.group="${styleSelector.styleGroups}">
+        <coral-selectlist-group label="${group.label}" data-editor-styleselector-group-multiple="${group.multiple}" data-sly-list.style="${group.styles}">
+            <coral-selectlist-item selected="${style.selected}" value="${style.id}">${style.label}</coral-selectlist-item>
+        </coral-selectlist-group>
+    </coral-selectlist>
+    <input data-sly-repeat.styleId="${styleSelector.visibleStyleIds}" type="hidden" name="./cq:styleIds" value="${styleId}" data-editor-styleselector-id-input="true"/>
+    <input data-sly-repeat.styleId="${styleSelector.hiddenStyleIds}" type="hidden" name="./cq:styleIds" value="${styleId}"/>
+    <input type="hidden" name="./sling:resourceType" value="${styleSelector.resourceType}"/>
+    <input type="hidden" name="./cq:styleIds@Delete"/>
+    <input type="hidden" name="./cq:styleIds@TypeHint" value="String[]"/>
+</form>
+

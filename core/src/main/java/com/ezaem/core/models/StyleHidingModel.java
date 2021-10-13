@@ -111,31 +111,3 @@ public class StyleHidingModel {
     }
 
 }
-
-
-//<section data-sly-use.model="com.ezaem.core.models.StyleHidingModel" class="coral-Form-fieldset" data-cq-styleselector="true">
-//    <div data-sly-repeat.group="${model.styleGroups}" class="coral-Form-fieldwrapper">
-//        <label class="coral-Form-fieldlabel" id="label_cq-styleselector-group-${groupList.index}">${group.label}</label>
-//        <coral-select name="./cq:styleIds" class="coral-Form-field" multiple="${group.multiple}" labelledby="label_cq-styleselector-group-${groupList.index}">
-//            <coral-select-item data-sly-test="${!group.multiple}" value="">${'None' @ i18n}</coral-select-item>
-//            <coral-select-item data-sly-repeat.style="${group.styles}" value="${style.id}" selected="${style.selected}">${style.label}</coral-select-item>
-//        </coral-select>
-//    </div>
-//    <input type="hidden" name="./cq:styleIds@Delete"/>
-//    <input type="hidden" name="./cq:styleIds@TypeHint" value="String[]"/>
-//</section>
-//}
-
-//<form data-sly-use.styleSelector="${'com.ezaem.core.models.StyleHidingModel' @ path=request.requestPathInfo.suffix, resourceType=request.requestParameterMap['resourceType']}" id="editor-styleselector-form" action="${styleSelector.action}" method="post" data-editor-styleselector-item-id="${styleSelector.path}" class="foundation-form" data-foundation-form-ajax="true" data-editor-styleselector-form>
-//    <coral-selectlist class="editor-StyleSelector-selectList" multiple data-editor-styleselector-selectlist data-sly-list.group="${styleSelector.styleGroups}">
-//        <coral-selectlist-group label="${group.label}" data-editor-styleselector-group-multiple="${group.multiple}" data-sly-list.style="${group.styles}">
-//            <coral-selectlist-item selected="${style.selected}" value="${style.id}">${style.label}</coral-selectlist-item>
-//        </coral-selectlist-group>
-//    </coral-selectlist>
-//    <sly data-sly-list.style="${styleSelector.appliedStyles}">
-//        <input type="hidden" name="./cq:styleIds" value="${style.id}" data-editor-styleselector-id-input="true"/>
-//    </sly>
-//    <input type="hidden" name="./sling:resourceType" value="${styleSelector.resourceType}"/>
-//    <input type="hidden" name="./cq:styleIds@Delete"/>
-//    <input type="hidden" name="./cq:styleIds@TypeHint" value="String[]"/>
-//</form>
